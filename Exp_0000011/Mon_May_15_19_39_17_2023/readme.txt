@@ -159,3 +159,14 @@ Este experimento visa medir a aderência do modelo gerado na dumbell do experimen
 Sendo assim, o test_client01 foi originado com dados levantados da parkinglot, que serão previstos pelos pesos treinados com os dados da dumbell anterior.
 Na topologia considerada, ajustou-se os RTT entre os roteadores de 5ms, de forma que desse os 100ms das dumbell consideradas nos experimentos anteriores. Colocando 100ms para cada roteador ficou muito lenta a troca de pacortes e, consequentemnete, a geração dos arquivos .
 Também foi retirada a calda de zeros no final do test_client01.
+Teste de Aderencia: 
+40, 20 longos (4GB), 10 Very Short (10KB) e 10 Short (100KB), entrando no terço final da simulação
+Topologia: Parking Lot (1000MB entre os terminias e os roteadores , 1MB de bottleneck), RTT Terminal base 0,5ms; RTT servidor 10ms; RTT1=5ms; salto RTT= 5ms.
+Tempo de Simulação:60min.
+Este experimento visa medir a aderência do modelo gerado na dumbell do experimento anterior na parkinglot aqui descrita
+Sendo assim, o test_client01 foi originado com dados levantados da parkinglot, que serão previstos pelos pesos treinados com os dados da dumbell anterior.
+Na topologia considerada, ajustou-se os RTT entre os roteadores de 0,005ms, pois com roteadores, o processamento da fila faz com que demore mais.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
