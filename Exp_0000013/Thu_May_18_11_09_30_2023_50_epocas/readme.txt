@@ -107,3 +107,12 @@ Prevendo a média móvel.
 {Epoch: 47} loss: 0.003555, mean_absolute_error: 0.042023
 {Epoch: 48} loss: 0.003726, mean_absolute_error: 0.041148
 {Epoch: 49} loss: 0.003959, mean_absolute_error: 0.042233
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
