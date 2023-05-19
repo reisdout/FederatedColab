@@ -1082,7 +1082,7 @@ def GeneralTraining(parExpDir, parTrainingPath, parTestPath,parExpDescription):
 
 
 
-    exp_epoch = 1
+    exp_epoch = 300
     exp_units = 100
     exp_batch_size=32
     exp_T=30
