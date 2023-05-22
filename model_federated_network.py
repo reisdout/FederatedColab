@@ -226,14 +226,17 @@ class Client():
  
       #self.centralServer.RegisterClient(self,self)
 
-    def NormalizeFeatures(self, data, parLoadTestFromFile=False):
+    def NormalizeFeatures(self, data, parLoadFromNotTrainedFile=False,parSequencialTraining=False):
        
        ack_ewma_normalizer=1.0
        send_ewma_normalizer=1.0
        rtt_ratio_normalizer=1.0
        cwnd_normalizer=1.0
        
-       if(parLoadTestFromFile):
+       #Obtendo o RTT Ratio
+       data['rtt_ratio'] = data['rtt_ratio'].div(data['rtt_ratio'].min())
+       
+       if(parLoadFromNotTrainedFile or parSequencialTraining): #Deve-se carregar parametros do arquivo
            ack_ewma_normalizer, send_ewma_normalizer,rtt_ratio_normalizer,cwnd_normalizer= self.ReadNormalizationFactors()
            
        else:
@@ -247,6 +250,9 @@ class Client():
            file1.writelines("rtt_ratio: "+str(rtt_ratio_normalizer)+"\n")
            file1.writelines("cwnd (Bytes): "+str(cwnd_normalizer)+"\n")
            file1.close()
+       
+       #print("ack_ewma_normalizer: ", ack_ewma_normalizer)
+       #print("rtt_ratio_normalizer: ", rtt_ratio_normalizer)
 
        data['ack_ewma(ms)'] = data['ack_ewma(ms)'].div(ack_ewma_normalizer)
        data['send_ewma(ms)'] = data['send_ewma(ms)'].div(send_ewma_normalizer)
@@ -269,10 +275,10 @@ class Client():
           print("Pesos Mantidos de acordo com o modelo do cliente")
           return False
 
-    def LoadTrainingDataSet(self):
+    def LoadTrainingDataSet(self,parSequencialTraining=False):
       base = pd.read_csv(self.trainingPath)
       base = base.dropna()
-      base = self.NormalizeFeatures(base)
+      base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile=False,parSequencialTraining=parSequencialTraining)
       base_treinamento, self.base_teste = self.SplitBase(base)
       base_treinamento = base.iloc[:, [1,2,3,4,5]].values
       #base_treinamento = base.iloc[:, [1,2,3,5]].values
@@ -461,12 +467,15 @@ class Client():
       return regressor
 
 
-    def RefreshModel(self, parInitial=False): #Constroi na primeira vez e atualiza, a partir da avaliação do servidor cetral
+    def RefreshModel(self,parSequencialTraining=False): #Constroi na primeira vez e atualiza, a partir da avaliação do servidor cetral
       #pensar melhor no critério
-      previsores,real_congestion = self.LoadTrainingDataSet()
+      previsores,real_congestion = self.LoadTrainingDataSet(parSequencialTraining)
 
       #regressor = Sequential()
-      regressor = self.GetModel();
+      if(parSequencialTraining):
+          regressor=self.GetModelFromFile(1)
+      else:
+          regressor = self.GetModel();
       #indica que já foi feito um treinamento ou consolidação de modelos prévia
       if(len (self.weightsClientModel)):
         regressor.set_weights(self.weightsClientModel)      
@@ -595,15 +604,22 @@ class Client():
       print (f"Modelo do Servidor avaliado pelo cliente {self.id}")
       return updated 
 
-    def LoadTestData(self, parLoadTestFromFile=False):
+    def LoadTestData(self, parLoadFromNotTrainedFile=False):
       #Esse if é pensado na hora de testar o modelo com dados de outros experimentos, completamente
       #alheisos com os que foram treinados 
-      if(parLoadTestFromFile): #Daí pega o testPath, que, a princípio, é um experimento diferente daquele para no qual os
+      if(parLoadFromNotTrainedFile): #Daí pega o testPath, que, a princípio, é um experimento diferente daquele para no qual os
                                #pesos salvos foram treinados
         print("From File")
         base = pd.read_csv(self.testPath)
         base = base.dropna()
-        base = self.NormalizeFeatures(base,parLoadTestFromFile)
+        '''
+        parLoadFromNotTrainedFile tem a ver com a aderencia do modelo sobre arquivos que não participaram 
+        do treinamento.
+        
+        parSequencialTraining tem a ver com um teste na sequencia de um treinamento que estabeleceu
+        os parametros de normalização.
+        '''
+        base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile,parSequencialTraining=False)
         base_treinamento, external_base_teste = self.SplitBase(base)
         self.real_congestion_test = external_base_teste.iloc[:, 5:6].values
         frames = [base_treinamento, external_base_teste]
@@ -612,7 +628,13 @@ class Client():
       else: #caminho normal, durante o treinamento
         base = pd.read_csv(self.trainingPath)
         base = base.dropna()
-        base = self.NormalizeFeatures(base)
+        '''
+            Apesar de não ser um "sequencial training" com outro arquivo de treinamento, 
+            parSequencialTraining=True, pois deve tomar os normalizadores levantados
+            no primeiro treinamento, o que dá uma ar de sequencia. Resumindo, os testes
+            são na sequencia de um treinamento prévio, sempre
+        '''
+        base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile,parSequencialTraining=True)
         base_treinamento, external_base_teste = self.SplitBase(base)
         #A base teste está sendo preparada no SplitBase
         #base_teste = pd.read_csv(self.testPath)
@@ -727,11 +749,11 @@ class Client():
     '''
 
    
-    def GetPrevision(self, parSave=0,parLoadTestFromFile=False): #evalueta indica que é uma avaliação do modelo recebido como parametro, no caso do servidor
+    def GetPrevision(self, parSave=0,parLoadTestFromNotTrainedFile=False): #evalueta indica que é uma avaliação do modelo recebido como parametro, no caso do servidor
 
       #parSave se refere aos pesos e modelo salvos a no round parSave. Por
       #isso só é usado se parLoadTestFromFile for True
-      test_vectors = self.LoadTestData(parLoadTestFromFile)# parLoadTestFromFile indica que é para pegar do test_client, 
+      test_vectors = self.LoadTestData(parLoadTestFromNotTrainedFile)# parLoadTestFromFile indica que é para pegar do test_client, 
                                                            #que, a princípio, veio de outro experimento
 
       #print("Observe os testadores")
@@ -739,7 +761,7 @@ class Client():
       #print(test_vectors)
       #input("testadores exibidos")
 
-      if(not parLoadTestFromFile):
+      if(not parLoadTestFromNotTrainedFile):
         regressor=self.GetModel()
         regressor.set_weights(self.weightsClientModel)
 
@@ -800,7 +822,7 @@ class Client():
       #return self.currentConfusionMatriz # Com a configuração corrente, essa é a matriz....
       return previsoes
         
-    def PlotResults(self,parLoadFromFile=False):
+    def PlotResults(self,parLoadFromNotTrainedFileFile=False):
       fig, graph = plt.subplots()
       graph.plot(self.real_congestion_test, color = 'red', label = 'Cng Real')
       #if(parLoadFromFile):
@@ -831,7 +853,7 @@ class Client():
       fig.text(1.1,1,textbox,fontsize=10,transform=graph.transAxes, bbox=bbox, verticalalignment='top')
       self.num_plot=self.num_plot+1
       #tem que passar dpi=300, bbox_inches='tight' para salvar igual mostra! ver **https://problemsolvingwithpython.com/06-Plotting-with-Matplotlib/06.04-Saving-Plots/**
-      if(parLoadFromFile):
+      if(parLoadFromNotTrainedFileFile):
         fig.savefig(self.exp_dir_out_from_file+"/client{id:0>3}_{num_plot:0>3}".format(id=self.id,num_plot=self.num_plot)+".png",dpi=300, bbox_inches='tight')
       else:
         fig.savefig(self.exp_dir_out_from_fit+"/client{id:0>3}_{num_plot:0>3}".format(id=self.id,num_plot=self.num_plot)+".png",dpi=300, bbox_inches='tight')
@@ -1030,7 +1052,7 @@ A cada round:
 '''
 
 
-def GeneralTraining(parExpDir, parTrainingPath, parTestPath,parExpDescription):
+def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTestPath, parExpDescription,parSequencialTraining=False):
 
     #objServeAMA = Server_FederatedAMA()
     #objServerInterChange = Server_FederatedInterChange()
@@ -1062,26 +1084,39 @@ def GeneralTraining(parExpDir, parTrainingPath, parTestPath,parExpDescription):
     '''
 
     #local_env=True;
-    exp_time=time.ctime();
+    
+    if(not parSequencialTraining):
+        exp_time=time.ctime();
 
-    exp_time = exp_time.replace(":", "_" )
-    exp_time = exp_time.replace(" ", "_" )
-    '''
-    if(not local_env):
-      exp_dir = "/content/drive/MyDrive/Colab Notebooks/Exp_000007/"
+        exp_time = exp_time.replace(":", "_" )
+        exp_time = exp_time.replace(" ", "_" )
+        '''
+            if(not local_env):
+                exp_dir = "/content/drive/MyDrive/Colab Notebooks/Exp_000007/"
+            else:
+                exp_dir = "./Exp_000007/"
+        '''
+        exp_dir=os.path.join(parExpDir, exp_time)
+        exp_dir_out_from_fit = exp_dir+"/from_fit" #para armazenar saídas obtidas de pesos/modelos treinados (fit)
+        exp_dir_out_from_file = exp_dir+"/from_fle" #para armazenar saídas obtidas de pesos/modelos recuperados do arquivo 
+
+        #criando efetivamednte os diretórios
+        os.mkdir(exp_dir)
+        os.mkdir(exp_dir_out_from_fit)
+        os.mkdir(exp_dir_out_from_file)
+        #print(exp_dir)
+        #print(exp_time)
     else:
-      exp_dir = "./Exp_000007/"
-    '''
-    exp_dir=os.path.join(parExpDir, exp_time)
-    exp_dir_out_from_fit = exp_dir+"/from_fit" #para armazenar saídas obtidas de pesos/modelos treinados (fit)
-    exp_dir_out_from_file = exp_dir+"/from_fle" #para armazenar saídas obtidas de pesos/modelos recuperados do arquivo 
-    #criando efetivamednte os diretórios
-    os.mkdir(exp_dir)
-    os.mkdir(exp_dir_out_from_fit)
-    os.mkdir(exp_dir_out_from_file)
+        exp_dir=parPreviousTrainingExpDir
+        exp_time = exp_dir.split("/")[len(exp_dir.split("/"))-1]
+        exp_dir_out_from_fit = exp_dir+"/from_fit" #para armazenar saídas obtidas de pesos/modelos treinados (fit)
+        exp_dir_out_from_file = exp_dir+"/from_fle" #para armazenar saídas obtidas de pesos/modelos recuperados do arquivo 
+        print(exp_dir)
+        print(exp_time)
+        
 
 
-
+    
     exp_epoch = 300
     exp_units = 100
     exp_batch_size=32
@@ -1094,13 +1129,14 @@ def GeneralTraining(parExpDir, parTrainingPath, parTestPath,parExpDescription):
 
     file_path = exp_dir+"/readme.txt"
 
-    f = open(file_path, "w")
+    f = open(file_path, "a")
 
     f.write("Epocas: "+ str(exp_epoch)+"\n")
     f.write("Units: " +str(exp_units)+"\n")
     f.write("Batch Size:" + str(exp_batch_size)+"\n")
     f.write("Janela Previsao: "+ str(exp_T)+"\n")
     f.write("Ahead Steps:"+str(exp_steps_out)+"\n")
+    f.write("Training File:"+parTrainingPath+"\n")
     f.write(parExpDescription)
     f.close()
 
@@ -1212,7 +1248,7 @@ def GeneralTraining(parExpDir, parTrainingPath, parTestPath,parExpDescription):
       #Observe que isso pode ser feito por treinamento ou por consolidação
       #Quando feito por treinamento, os pesos são sempre atualizados no final do treinamento
       #Já na consolidação, vai depender se houve um melhor resultado (média avsoluta dos erros)
-      objClient1.RefreshModel(parInitial=True) #Refresh por Treinamento
+      objClient1.RefreshModel(parSequencialTraining) #Refresh por Treinamento
       #gc.collect()
       #objClient2.RefreshModel(parInitial=True)
       #gc.collect()
@@ -1284,7 +1320,7 @@ def GeneralTraining(parExpDir, parTrainingPath, parTestPath,parExpDescription):
       #print (objClient3.currentConfusionMatriz)
 
 
-
+    return exp_dir
 
 
 #Avaliar um modelo, treinado em uma determinada topologia
@@ -1366,8 +1402,8 @@ def EvalueteModelLevarage(parPreviousExpTime,
 
     lastRound=1
 
-    objClient1.GetPrevision(lastRound,parLoadTestFromFile=True)
-    objClient1.PlotResults(parLoadFromFile=True)
+    objClient1.GetPrevision(lastRound,parLoadTestFromNotTrainedFile=True)
+    objClient1.PlotResults(parLoadFromNotTrainedFileFile=True)
    
 
 
