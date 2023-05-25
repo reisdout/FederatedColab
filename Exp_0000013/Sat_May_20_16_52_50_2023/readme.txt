@@ -6138,3 +6138,381 @@ Treinamento Sequencial.
 {Epoch: 297} loss: 0.000450, mean_absolute_error: 0.015150
 {Epoch: 298} loss: 0.000484, mean_absolute_error: 0.015647
 {Epoch: 299} loss: 0.000588, mean_absolute_error: 0.016494
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.
+Teste de Aderencia: 
+testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento.
+Média móvel da quantidade de pacotes na fila.
+Modelo com 300 épocas em cada round
+Verificando a aderencia sobre um dos modelos concatenados
+Dados que não participaram do treinamento, mas gerados na mesma rede.

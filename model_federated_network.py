@@ -251,8 +251,10 @@ class Client():
            file1.writelines("cwnd (Bytes): "+str(cwnd_normalizer)+"\n")
            file1.close()
        
-       #print("ack_ewma_normalizer: ", ack_ewma_normalizer)
-       #print("rtt_ratio_normalizer: ", rtt_ratio_normalizer)
+       print("ack_ewma_normalizer: ", ack_ewma_normalizer)
+       print("send_ewma: ", send_ewma_normalizer)
+       print("rtt_ratio_normalizer: ", rtt_ratio_normalizer)
+       print("cwnd (Bytes): ", cwnd_normalizer)
 
        data['ack_ewma(ms)'] = data['ack_ewma(ms)'].div(ack_ewma_normalizer)
        data['send_ewma(ms)'] = data['send_ewma(ms)'].div(send_ewma_normalizer)
@@ -603,10 +605,31 @@ class Client():
 
       print (f"Modelo do Servidor avaliado pelo cliente {self.id}")
       return updated 
+  
+    def DropCollums(self, base_completa):
+        
+      
+      base_completa = base_completa.drop('#Ack', axis =1) #
+      #base_completa = base_completa.drop('ack_ewma(ms)', axis =1)
+      #base_completa = base_completa.drop('send_ewma(ms)', axis =1)
+      #base_completa = base_completa.drop('rtt_ratio', axis =1)
+      #base_completa = base_completa.drop('cwnd (Bytes)', axis =1)
+      base_completa = base_completa.drop('Last Router Ocupation Ack Arriaval(Packets)', axis =1)#O que se quer prever
+      base_completa = base_completa.drop('Last Router Ocupation Packet Sent(Packets)', axis =1)
+      base_completa = base_completa.drop('Network Situation', axis =1)
+      base_completa = base_completa.drop('AckArrival(ms)', axis =1)
+      base_completa = base_completa.drop('TSInsideAck(ms)', axis =1)
+      base_completa = base_completa.drop('RTTAck(ms)', axis =1)
+      
+      return base_completa
+        
 
     def LoadTestData(self, parLoadFromNotTrainedFile=False):
       #Esse if é pensado na hora de testar o modelo com dados de outros experimentos, completamente
       #alheisos com os que foram treinados 
+      
+      X_teste = []
+      
       if(parLoadFromNotTrainedFile): #Daí pega o testPath, que, a princípio, é um experimento diferente daquele para no qual os
                                #pesos salvos foram treinados
         print("From File")
@@ -621,10 +644,24 @@ class Client():
         '''
         base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile,parSequencialTraining=False)
         base_treinamento, external_base_teste = self.SplitBase(base)
-        self.real_congestion_test = external_base_teste.iloc[:, 5:6].values
+        #self.real_congestion_test = external_base_teste.iloc[self.T+self.n_steps_out:, 5:6].values
+        self.real_congestion_test = base.iloc[self.T+self.n_steps_out-1:base.shape[0], 5:6].values
         frames = [base_treinamento, external_base_teste]
         base_completa = pd.concat(frames)
-        self.len_base_teste = len(external_base_teste)
+        self.len_base_teste = len(external_base_teste)        
+        base_completa = self.DropCollums(base_completa)
+        entradas = base_completa.values
+        
+
+        
+        for i in range(self.T, entradas.shape[0]):
+          end_ix = i+self.n_steps_out
+          if end_ix > entradas.shape[0]:
+            break;
+          #previsores.append(base_treinamento[i-self.T:i, 0:4])#o que é considerado é o limite superior do rante -1
+          X_teste.append(entradas[i-self.T:i, 0:4])#o que é considerado é o limite superior do rante -1 e sem a informação do percentual de ocupação do buffer
+          #real_congestion.append(base[(i-1)+self.n_steps_out,4])#
+        
       else: #caminho normal, durante o treinamento
         base = pd.read_csv(self.trainingPath)
         base = base.dropna()
@@ -647,7 +684,7 @@ class Client():
         frames = [base_treinamento, self.base_teste]
         base_completa = pd.concat(frames)
         self.len_base_teste = len(self.base_teste)
-      '''
+        '''
         A ideia do laço a seguir é 'shiftar' o congestionamento real de n_steps_out, a fim de se fazer a comparação
         com o última posição dos vetores previstos pela rede neural.
       
@@ -656,38 +693,27 @@ class Client():
               self.real_congestion_test[k][0] = self.real_congestion_test[k+self.n_steps_out-1][0]
           else:
             self.real_congestion_test[k][0] = self.real_congestion_test[base_teste.shape[0]-1][0]
-      '''
-      self.mean_real_congestion = self.real_congestion_test.mean()
-      #print("====== Média dos Congestionamentos: ",self.mean_real_congestion)
-      #print("observe os valores de teste deslocados")
-      #print(self.real_congestion_test.shape)
-      #print(self.real_congestion_test)
-      #input("Veja se foi feito o deslocamento corretamente")
+        '''
+      
+        #print("====== Média dos Congestionamentos: ",self.mean_real_congestion)
+        #print("observe os valores de teste deslocados")
+        #print(self.real_congestion_test.shape)
+        #print(self.real_congestion_test)
+        #input("Veja se foi feito o deslocamento corretamente")
 
-
-      base_completa = base_completa.drop('#Ack', axis =1) #
-      #base_completa = base_completa.drop('ack_ewma(ms)', axis =1)
-      #base_completa = base_completa.drop('send_ewma(ms)', axis =1)
-      #base_completa = base_completa.drop('rtt_ratio', axis =1)
-      #base_completa = base_completa.drop('cwnd (Bytes)', axis =1)
-      base_completa = base_completa.drop('Last Router Ocupation Ack Arriaval(Packets)', axis =1)#O que se quer prever
-      base_completa = base_completa.drop('Last Router Ocupation Packet Sent(Packets)', axis =1)
-      base_completa = base_completa.drop('Network Situation', axis =1)
-      base_completa = base_completa.drop('AckArrival(ms)', axis =1)
-      base_completa = base_completa.drop('TSInsideAck(ms)', axis =1)
-      base_completa = base_completa.drop('RTTAck(ms)', axis =1)
-      entradas = base_completa[len(base_completa) - self.len_base_teste - (self.T+self.n_steps_out-1):].values
+        base_completa = self.DropCollums(base_completa)
+        entradas = base_completa[len(base_completa) - self.len_base_teste - (self.T+self.n_steps_out-1):].values
       #base_teste_features = base_teste.iloc[:, [1,2,3,6]].values
       #print("#############len(base_teste): ",len(self.base_teste))
       
-      X_teste = []
+     
 
-      for i in range(self.T+self.n_steps_out-1, self.len_base_teste+self.T+self.n_steps_out-1): # para as duzentas previsoes, o mesmo tramanho do Teste.csv, ou seja 290-90
-        #X_teste.append(entradas[i-self.T:i,0:4])
-        #end_ix = i+self.n_steps_out
-        if i >= entradas.shape[0]:
-          break;
-        X_teste.append(entradas[i-(self.T+self.n_steps_out-1):i-(self.n_steps_out-1),0:4])
+        for i in range(self.T+self.n_steps_out-1, self.len_base_teste+self.T+self.n_steps_out-1): # para as duzentas previsoes, o mesmo tramanho do Teste.csv, ou seja 290-90
+          #X_teste.append(entradas[i-self.T:i,0:4])
+          #end_ix = i+self.n_steps_out
+          if i >= entradas.shape[0]:
+            break;
+          X_teste.append(entradas[i-(self.T+self.n_steps_out-1):i-(self.n_steps_out-1),0:4])
 
         #previsores.append(base_treinamento[i-self.T:i, 0:4])#o que é considerado é o limite superior do rante -1
         #real_congestion.append(base_treinamento[(i-1)+self.n_steps_out,4])#
@@ -695,6 +721,7 @@ class Client():
         #print(X_teste[i-self.T])
         #input("Exibido mais um previsor")
 
+      self.mean_real_congestion = self.real_congestion_test.mean()
 
       test_vectors = np.array(X_teste) # equivalente ao X_teste
       '''
@@ -754,7 +781,7 @@ class Client():
       #parSave se refere aos pesos e modelo salvos a no round parSave. Por
       #isso só é usado se parLoadTestFromFile for True
       test_vectors = self.LoadTestData(parLoadTestFromNotTrainedFile)# parLoadTestFromFile indica que é para pegar do test_client, 
-                                                           #que, a princípio, veio de outro experimento
+                                                                     #que, a princípio, veio de outro experimento
 
       #print("Observe os testadores")
       #print("shape: ",test_vectors.shape)
@@ -824,11 +851,21 @@ class Client():
         
     def PlotResults(self,parLoadFromNotTrainedFileFile=False):
       fig, graph = plt.subplots()
-      graph.plot(self.real_congestion_test, color = 'red', label = 'Cng Real')
+      
+      r=self.real_congestion_test
+      
+      lp=self.latest_prevision
+      
+      graph.plot(self.real_congestion_test[self.real_congestion_test.shape[0]-300:self.real_congestion_test.shape[0],:], color = 'red', label = 'Cng Real')
+      #graph.plot(self.real_congestion_test[0:300,:], color = 'red', label = 'Cng Real')
+
+      ################################################
       #if(parLoadFromFile):
         #graph.plot(self.latest_prevision*3.5, color = 'blue', label = 'Cng Previsto')
       #else:
-      graph.plot(self.latest_prevision, color = 'blue', label = 'Cng Previsto')
+      ################################################
+          
+      graph.plot(self.latest_prevision[self.latest_prevision.shape[0]-300:self.latest_prevision.shape[0],:], color = 'blue', label = 'Cng Previsto')
       graph.set_xlabel('ACK')
       graph.set_ylabel('Ocupacao Fila')
       graph.title.set_text('Previsão do Congestionamento {:0>3}'.format(self.id))
@@ -1407,6 +1444,19 @@ def EvalueteModelLevarage(parPreviousExpTime,
    
 
 
+'''
+description = "testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento."+"\n"  
+description =description + "Média móvel da quantidade de pacotes na fila.\n"
+description =description + "Modelo com 300 épocas em cada round\n"
+description = description+ "Verificando a aderencia sobre um dos modelos concatenados\n"
+description = description+ "Dados que não participaram do treinamento, mas gerados na mesma rede.\n"
+#description = description+ "Na topologia considerada, ajustou-se os RTT entre os roteadores de 0,005ms, pois com roteadores, o processamento da fila faz com que demore mais.\n"
+#description = description+ ".\n"
 
- 
+EvalueteModelLevarage(parPreviousExpTime="Sat_May_20_16_52_50_2023",
+                      parPreviousTrainingExpDir="./Exp_0000013/Sat_May_20_16_52_50_2023/",
+                      parPreviousTrainingPath="./Exp_0000013/training_client01-09.csv",
+                      parPathTestFromAnotherTopology="./Exp_0000013/test_client01_11.csv",
+                      parExpDescription=description)
 
+'''
