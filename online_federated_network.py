@@ -167,7 +167,8 @@ class Client():
                  parExpTime,
                  parExpDir,
                  par_exp_dir_out_from_fit,
-                 par_exp_dir_out_from_file):
+                 par_exp_dir_out_from_file,
+                 par_num_rodadas):
  
       self.id = parId
       self.id_in_server=-1 #-1 indica que não foi cadastrado no servidor
@@ -183,8 +184,6 @@ class Client():
       #self.total_ConsolidateModels=0;
       #self.base = pd.DataFrame()
       #self.base_treinamento =  np.array([])
-      self.real_congestion_test = np.array([])
-      self.latest_prevision = np.array([])
       #self.test_vectors = []
       #self.previsores = []
       #self.real_congestion = []
@@ -209,9 +208,12 @@ class Client():
       self.total_model_received_form_server=0
       self.model_saves = 0
       self.deslocamento = 1;
-      self.slide = 0; #guarda os avanços na base de dados, to tamanho de deslocamento
+      self.slide = 0; #guarda os avanços na base de dados, do tamanho de deslocamento
       self.exp_dir_out_from_fit = par_exp_dir_out_from_fit
       self.exp_dir_out_from_file =par_exp_dir_out_from_file
+      self.num_rodadas = par_num_rodadas
+      self.latest_prevision = np.empty((self.num_rodadas,1)) 
+      self.real_congestion_test = np.empty((self.num_rodadas,1)) 
       
       
     def ReadNormalizationFactors(self):
@@ -289,16 +291,18 @@ class Client():
     def LoadTrainingDataSet(self, parSequencialTraining=False):
       base = pd.read_csv(self.trainingPath)
       base = base.dropna()
+      base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile=False,parSequencialTraining=parSequencialTraining)
       if(not self.slide):
-          base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0) 
+          base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide+self.n_steps_out-1,base.shape[0]),axis=0) 
           
       else:
           base = base.drop(labels=range(0,self.deslocamento*self.slide),axis=0)
-          base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)        
+          #base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)
+          base = base.drop(labels=range(10*self.T+self.n_steps_out-1,base.shape[0]),axis=0)
       
       self.slide=self.slide+1
       
-      base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile=False,parSequencialTraining=parSequencialTraining)
+ 
       #base_treinamento, self.base_teste = self.SplitBase(base)
       base_treinamento = base.iloc[:, [1,2,3,4,5]].values
 
@@ -314,7 +318,7 @@ class Client():
 
       #real_congestion_ahead = []
 
-      #base_treinamento.shape[0] número de linhas dos dados de treinamento
+      print(base_treinamento.shape[0]) #número de linhas dos dados de treinamento
       #"-self.n_steps_out", pois, se não estoura, não dá para fazer 5 a frente a partir do último                                                                   
       for i in range(self.T, base_treinamento.shape[0]):
         end_ix = i+self.n_steps_out
@@ -507,7 +511,7 @@ class Client():
       #rlr = ReduceLROnPlateau(monitor = 'loss', factor = 0.2, patience = 5, verbose = 1)
       #mcp = ModelCheckpoint(filepath = self.exp_dir+"/pesos.h5", monitor = 'loss',  save_weights_only = True, save_freq='epoch',verbose = 1)
       #regressor.fit(previsores, real_congestion, epochs = 50, batch_size = 32, callbacks = [es, rlr, mcp])
-      regressor.fit(previsores, real_congestion, epochs = self.exp_epoch, batch_size = self.exp_batch_size,verbose=0,
+      regressor.fit(previsores, real_congestion, epochs = self.exp_epoch, batch_size = self.exp_batch_size,verbose=1,
                 callbacks=[LoggingCallback(parExpDir=self.exp_dir)])
       #self.weightsClientModel = regressor.get_weights().copy()
       regressor_json = regressor.to_json()
@@ -684,6 +688,7 @@ class Client():
       else: #caminho normal, durante o treinamento
         base = pd.read_csv(self.trainingPath)
         base = base.dropna()
+        base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile,parSequencialTraining=True)        
         '''
             Apesar de não ser um "sequencial training" com outro arquivo de treinamento, 
             parSequencialTraining=True, pois deve tomar os normalizadores levantados
@@ -691,8 +696,11 @@ class Client():
             são na sequencia de um treinamento prévio, sempre
         '''
         base = base.drop(labels=range(0,self.deslocamento*self.slide),axis=0)
-        base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)   
-        base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile,parSequencialTraining=True)
+        #base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)
+        self.real_congestion_test[self.slide-1,0] = base.iloc[10*self.T+self.n_steps_out-1:10*self.T+self.n_steps_out, 5:6].values[0,0]
+        base = base.drop(labels=range(10*self.T+self.n_steps_out-1,base.shape[0]),axis=0)
+
+
         #base_treinamento, external_base_teste = self.SplitBase(base)
         #A base teste está sendo preparada no SplitBase
         #base_teste = pd.read_csv(self.testPath)
@@ -831,9 +839,9 @@ class Client():
       #print("Observe as previsoes:")
       #print(previsoes)
       #input("Observe as previsoes")
-      self.latest_prevision = np.empty((previsoes.shape[0],1))      
-      for i in range(previsoes.shape[0]):
-        self.latest_prevision[i][0]=previsoes[i][self.n_steps_out-1]
+      #self.latest_prevision = np.empty((previsoes.shape[0],1))      
+      #for i in range(previsoes.shape[0]):
+      self.latest_prevision[self.slide-1,0]=previsoes[previsoes.shape[0]-1,self.n_steps_out-1]
       
       '''
       A ideia do laço a seguir é tomar a última posição dos vetores previstos pela rede neural, que corresponde a 
@@ -885,8 +893,12 @@ class Client():
       
       lp=self.latest_prevision
       
+      print(r)
+      
+      print(lp)
+      
       #graph.plot(self.real_congestion_test[self.real_congestion_test.shape[0]-300:self.real_congestion_test.shape[0],:], color = 'red', label = 'Cng Real')
-      graph.plot(self.real_congestion_test[0:300,:], color = 'red', label = 'Cng Real')
+      graph.plot(self.real_congestion_test, color = 'red', label = 'Cng Real')
 
       ################################################
       #if(parLoadFromFile):
@@ -894,7 +906,7 @@ class Client():
       #else:
       ################################################
           
-      #graph.plot(self.latest_prevision[0:300,:], color = 'blue', label = 'Cng Previsto')
+      graph.plot(self.latest_prevision, color = 'blue', label = 'Cng Previsto')
       graph.set_xlabel('ACK')
       graph.set_ylabel('Ocupacao Fila')
       graph.title.set_text('Previsão do Congestionamento {:0>3}'.format(self.id))
@@ -919,11 +931,11 @@ class Client():
       fig.text(1.1,1,textbox,fontsize=10,transform=graph.transAxes, bbox=bbox, verticalalignment='top')
       self.num_plot=self.num_plot+1
       #tem que passar dpi=300, bbox_inches='tight' para salvar igual mostra! ver **https://problemsolvingwithpython.com/06-Plotting-with-Matplotlib/06.04-Saving-Plots/**
+      plt.legend()
       if(parLoadFromNotTrainedFileFile):
         fig.savefig(self.exp_dir_out_from_file+"/client{id:0>3}_{num_plot:0>3}".format(id=self.id,num_plot=self.num_plot)+".png",dpi=300, bbox_inches='tight')
       else:
         fig.savefig(self.exp_dir_out_from_fit+"/client{id:0>3}_{num_plot:0>3}".format(id=self.id,num_plot=self.num_plot)+".png",dpi=300, bbox_inches='tight')
-      plt.legend()
       plt.show()
       
             
@@ -1183,13 +1195,14 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
 
 
     
-    exp_epoch = 30
+    exp_epoch = 3
     exp_units = 100
-    exp_batch_size=32
+    exp_batch_size=10
     exp_T=30
     exp_steps_out =5
     exp_congestion_protocol = "BBR"
     exp_web_nodes= 2
+    exp_num_rodadas=10 #Quantas rodadas de aprendizado online. É o range do for 
 
     #Registando dados gerais, comum a todos os clientes, no readme.txt
 
@@ -1253,7 +1266,8 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
                         exp_time,
                         exp_dir,
                         exp_dir_out_from_fit,
-                        exp_dir_out_from_file)
+                        exp_dir_out_from_file,
+                        exp_num_rodadas)
 
 
 
@@ -1308,13 +1322,15 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
     #########################Atualizando o modelo por treinamento e Consolidação do Servidor#######################################
 
     '''
-    for i in range(10):
+    for i in range(exp_num_rodadas):
       print("##################Round ", i, " ##################################")
       #########################Atualizando o modelo por treinamento #######################################
       #Observe que isso pode ser feito por treinamento ou por consolidação
       #Quando feito por treinamento, os pesos são sempre atualizados no final do treinamento
       #Já na consolidação, vai depender se houve um melhor resultado (média avsoluta dos erros)
-      objClient1.RefreshModel(bool(i)) #Refresh por Treinamento
+      
+      ##objClient1.RefreshModel(bool(i)) #Refresh por Treinamento
+      
       #gc.collect()
       #objClient2.RefreshModel(parInitial=True)
       #gc.collect()
@@ -1386,7 +1402,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
       #objClient3.GetPrevision()
       #print (objClient3.currentConfusionMatriz)
 
-
+    objClient1.PlotResults()
     return exp_dir
 
 
