@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May 24 18:43:42 2023
-
-@author: visitante
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri May 19 14:10:03 2023
-
-@author: visitante
-"""
-
 import time
 import random
 import numpy as np
@@ -34,93 +20,6 @@ from tensorflow.python import training
 #%matplotlib notebook
 import os 
 import gc
-
-
-'''
-  
-class Server_FederatedOMS:
-  
-  In the central server, we decide to use only the highest
-  accuracy holder model as the central server updated model, send it to the local
-  clients after the computation.
-
-
-
-  def ReceiveModelsFromClients(self, parIdCliente):
-    print("Recebido Modelo do Cliente 1")
-  def Consolidar(self):
-    print("Consolidado todos os modelos")
-  def FeedBackConsolidatedModel(self):
-    print ("Modelos enviados")
-
-  clients = ['Cliente1', 'Cliente2']
-
-
-class Server_FederatedBMA():
-
-owever, in the BMA technique, the central server receives
-four models with model accuracy performances from the local servers or clients.
-In the central server, we sort the model using their performances. Then we
-decide to use the two best models or half of the models based on performances.
-Then BMA technique loops through each model’s hidden layers and neurons to do
-the sum of the weights and average them accordingly.
-
-  def ReceiveModelsFromClients(self)
-  def Consolidar(self)
-  def FeedBackConsolidatedModel(self)
-
-    clients[] = ['Cliente1', 'Cliente2']
-
-
-
-    def __init__(self, parCentralServer, parId):
-      self.id=parId
-      self.centralServer = parCentralServer
-      #self.centralServer.RegisterClient(self,self)
-
-
-'''
-
-
-'''
-https://ai-pool.com/d/how-to-get-the-weights-of-keras-model-
-
-Keras has implemented some functions for getting or setting weights for every layer.
-
-layer.get_weights(): returns the weights of the layer as a list of Numpy arrays.
-layer.set_weights(weights): sets the weights of the layer from a list of Numpy arrays.
-
-Using these functions you can write a piece of code to get all layers' weights
-
-for layer in model.layers: weights = layer.get_weights() # list of numpy arrays
-
-Or you can get the weights right from the model
-
-from keras.models import Sequential
-
-model = Sequential()
-...
-
-weights = model.get_weights() # returs a numpy list of weights
-
-Keras model also has get_weights() and set_weights(weights) functions like every layer has.
-
-If you need more take a look at this keras doc.
-
-https://stackoverflow.com/questions/47183159/how-to-set-weights-in-keras-with-a-numpy-array
-
-The set_weights() method of keras accepts a list of numpy arrays, what you have passed to the method seems like a single array. The shape of this should be the same as the shape of the output of get_weights() on the same layer. Here's the code:
-
-l=[]
-x=np.array() #weights
-y=np.array() #array of biases
-l.append(x)
-l.append(y)
-
-loaded_model.layers[0].set_weights(l) #loaded_model.layer[0] being the layer
-
-
-'''
 
 
 
@@ -213,7 +112,10 @@ class Client():
       self.exp_dir_out_from_file =par_exp_dir_out_from_file
       self.num_rodadas = par_num_rodadas
       self.latest_prevision = np.empty((self.num_rodadas,1)) 
-      self.real_congestion_test = np.empty((self.num_rodadas,1)) 
+      self.real_congestion_test = np.empty((self.num_rodadas,1))
+      self.training_head = 0
+      self.training_tail = 50*self.T
+    
       
       
     def ReadNormalizationFactors(self):
@@ -292,17 +194,12 @@ class Client():
       base = pd.read_csv(self.trainingPath)
       base = base.dropna()
       base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile=False,parSequencialTraining=parSequencialTraining)
-      if(not self.slide):
-          base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide+self.n_steps_out-1,base.shape[0]),axis=0) 
+      
+      base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide+self.n_steps_out-1,base.shape[0]),axis=0) 
+    
+      self.slide=self.slide+1 #Na hora de testar já deve estar deslocado
           
-      else:
-          base = base.drop(labels=range(0,self.deslocamento*self.slide),axis=0)
-          #base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)
-          base = base.drop(labels=range(10*self.T+self.n_steps_out-1,base.shape[0]),axis=0)
-      
-      self.slide=self.slide+1
-      
- 
+    
       #base_treinamento, self.base_teste = self.SplitBase(base)
       base_treinamento = base.iloc[:, [1,2,3,4,5]].values
 
@@ -511,7 +408,7 @@ class Client():
       #rlr = ReduceLROnPlateau(monitor = 'loss', factor = 0.2, patience = 5, verbose = 1)
       #mcp = ModelCheckpoint(filepath = self.exp_dir+"/pesos.h5", monitor = 'loss',  save_weights_only = True, save_freq='epoch',verbose = 1)
       #regressor.fit(previsores, real_congestion, epochs = 50, batch_size = 32, callbacks = [es, rlr, mcp])
-      regressor.fit(previsores, real_congestion, epochs = self.exp_epoch, batch_size = self.exp_batch_size,verbose=1,
+      regressor.fit(previsores, real_congestion, epochs = self.exp_epoch, batch_size = self.exp_batch_size,verbose=0,
                 callbacks=[LoggingCallback(parExpDir=self.exp_dir)])
       #self.weightsClientModel = regressor.get_weights().copy()
       regressor_json = regressor.to_json()
@@ -695,11 +592,11 @@ class Client():
             no primeiro treinamento, o que dá uma ar de sequencia. Resumindo, os testes
             são na sequencia de um treinamento prévio, sempre
         '''
-        base = base.drop(labels=range(0,self.deslocamento*self.slide),axis=0)
+        #base = base.drop(labels=range(0,self.deslocamento*self.slide),axis=0)
         #base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)
-        self.real_congestion_test[self.slide-1,0] = base.iloc[10*self.T+self.n_steps_out-1:10*self.T+self.n_steps_out, 5:6].values[0,0]
-        base = base.drop(labels=range(10*self.T+self.n_steps_out-1,base.shape[0]),axis=0)
-
+        stop_point = 10*self.T+self.deslocamento*self.slide #Se stop point = 300 é de 0 a 299, daí o (stop_point -1) abaixo
+        self.real_congestion_test[self.slide-1,0] = base.iloc[(stop_point-1)+self.n_steps_out:stop_point + self.n_steps_out+1, 5:6].values[0,0]
+        base = base.drop(labels=range(stop_point,base.shape[0]),axis=0)
 
         #base_treinamento, external_base_teste = self.SplitBase(base)
         #A base teste está sendo preparada no SplitBase
@@ -820,8 +717,8 @@ class Client():
       
       
 
-      #print("Observe os testadores")
-      #print("shape: ",test_vectors.shape)
+      print("Observe os testadores")
+      print("shape: ",test_vectors.shape)
       #print(test_vectors)
       #input("testadores exibidos")
 
@@ -841,7 +738,9 @@ class Client():
       #input("Observe as previsoes")
       #self.latest_prevision = np.empty((previsoes.shape[0],1))      
       #for i in range(previsoes.shape[0]):
-      self.latest_prevision[self.slide-1,0]=previsoes[previsoes.shape[0]-1,self.n_steps_out-1]
+      self.latest_prevision[self.slide-1,0] = previsoes[previsoes.shape[0]-1,self.n_steps_out-1]
+        
+     
       
       '''
       A ideia do laço a seguir é tomar a última posição dos vetores previstos pela rede neural, que corresponde a 
@@ -950,184 +849,9 @@ class Client():
       regressorServer = self.GetModel()
       #regressorServer.set_weights(self.weightsServerModel)
       return self.EvalueteServerModel(regressorServer)
-
-
-
-class Server_Federated():
-
-  def __init__(self):
-    self.clients = []
-    self.ReceivedModel = [False,False,False]
-    self.consolidateWeightMatrix = []
-    self.total_clients = 0;
-
-  def PrintRegistredClients(self):
-    print("Registring Clients")
-    for x in self.clients:
-      print("Client ", x.id)
   
-  def RegisterClient(self, parCliente):
-    parCliente.id_in_server = self.total_clients
-    self.clients.append(parCliente)
-    self.total_clients = self.total_clients+1
-    #print("Cliente ", parCliente.id, " Regitrado com sucesso")
-
-  '''
-  def ReceiveModelsFromClient(self, parId):
-   print("Recebido Modelos dos Cliente ", parId)    
-   self.ConsolideModels()
-
-  '''  
     
-
-
-
-class Server_FederatedAMA(Server_Federated):
-  '''
-  During the aggregation,
-  we first sum and average the neuron weights of each model. Then we store the
-  average value in the designated global model position. In the neural network
-  model, the same process is calculated for every neuron. After completing Al-
-  gorithm 2, the central server aggregated model is sent to all the clients for the
-  next learning phase
-  '''
-  def __init__(self):
-    Server_Federated.__init__(self)
-
-  def ConsolidateModels(self):
-
-    numberClients = len(self.clients)
-    #lstTemp = []
-    #arrays_in_Layer=[]
-    #lst_arrays_in_Layer = []
-    #lst_consolidated_arrays_in_layer = [] #as camadas, composta por arraysconsolidados
-    #consolidated_arrays_in_layer = [] #arrays da camada
-    #consolidated_array = None
-    consolidated_model = []
-    clients_weighted_models = []
-    '''
-    #Cada weightsClientModel é uma lista de numpyarrays crua "flatem", isto é
-    se um modelo tem, por exemplo, 3 camadas e cada uma com dois arrays, o 
-    weightsClientModel será uma lista de 6 numpy´s, com os dois primeiros vetores da 
-    primeira camada no início, seguidos dos dois da segunta e, depois, os dois da terceira.
-    Nada de listas. É uma Listona de numpys
-    '''
-    for client in self.clients:
-        #print(client.weightsClientModel)
-        #input("pesos acima")
-        clients_weighted_models.append(client.weightsClientModel)
-    
-    
-    #Criando a estrutura do Modelo
-    #for model in client_weighted_model:
-    for i in range(0,len (clients_weighted_models)):#Cada Clinte
-       for j in range (0, len(clients_weighted_models[i])):
-            if(i==0):
-                consolidated_model.append(clients_weighted_models[i][j])#alocando a lista com os pesos do primeiro modelo.
-            else:
-                consolidated_model[j] = consolidated_model[j] + clients_weighted_models[i][j]
-            if (i == numberClients - 1):
-                consolidated_model[j] = consolidated_model[j]/numberClients
- 
-    #self.consolidateWeightMatrix = consolidated_model # cuidado com isso!
-    self.consolidateWeightMatrix.clear()
-    for e in consolidated_model:
-        self.consolidateWeightMatrix.append(e)
-
-    
-    print("Amostra Peso Clientes:")
-    for client in self.clients:
-      print("============================")
-      print(client.weightsClientModel[0][0][0:4])
-    print("Amostra Peso Consolidado: ")
-    print(self.consolidateWeightMatrix[0][0][0:4])
   
-  def FeedBackConsolidatedModel(self):
-    for x in self.clients:
-      x.ReceiveModelFromServer(self.consolidateWeightMatrix.copy(),1,"AMA")
-    self.consolidateWeightMatrix.clear()
-    print("Feedbacks Enviados e descartados")
-
-
-
-class Server_FederatedInterChange(Server_Federated):
-  '''
-  Manda os modelos dos outros clientes para cada um dos clientes cadastrados 
-  '''
-  def __init__(self):
-    Server_Federated.__init__(self)
-
-  def ConsolidateModels(self): # no interchance deve-se passar o  cliente, 
-                                          # justamente para que o própio modelo não seja passado
-
-    #numberClients = len(self.clients)
-    #lstTemp = []
-    #arrays_in_Layer=[]
-    #lst_arrays_in_Layer = []
-    #lst_consolidated_arrays_in_layer = [] #as camadas, composta por arraysconsolidados
-    #consolidated_arrays_in_layer = [] #arrays da camada
-    #consolidated_array = None
-    clients_weighted_models = []
-    '''
-    #Cada weightsClientModel é uma lista de numpyarrays crua "flatem", isto é
-    se um modelo tem, por exemplo, 3 camadas e cada uma com dois arrays, o 
-    weightsClientModel será uma lista de 6 numpy´s, com os dois primeiros vetores da 
-    primeira camada no início, seguidos dos dois da segunta e, depois, os dois da terceira.
-    Nada de listas. É uma Listona de numpys
-    '''
-    for client in self.clients:
-        #print(client.weightsClientModel)
-        #input("pesos acima")
-        clients_weighted_models.append(client.weightsClientModel)
-    
-    
-    #Criando a estrutura do Modelo
-    #for model in client_weighted_model:
-    client_model=[]
-    self.consolidateWeightMatrix.clear()
-    for i in range(0,len (clients_weighted_models)):#Cada Clinte
-      for j in range (0, len(clients_weighted_models[i])):
-        client_model.append(clients_weighted_models[i][j])
-      self.consolidateWeightMatrix.append(client_model.copy())
-      client_model.clear()
-  
- 
-    #self.consolidateWeightMatrix = consolidated_model # cuidado com isso!
-    print("Amostra Peso Clientes:")
-    for client in self.clients:
-      print(f"========Cliente {client.id}=============")
-      print(client.weightsClientModel[0][0][0:4])
-    print("Amostra Peso Consolidado por INTERCHANGE: ")
-    print(self.consolidateWeightMatrix[0][0][0][0:4])
-
-  def FeedBackConsolidatedModel(self):
-    consolidateWeightMatrix_to_client=[]
-    for x in self.clients:
-      for i in range (len(self.consolidateWeightMatrix)):
-         if(i != x.id_in_server):
-           consolidateWeightMatrix_to_client.append(self.consolidateWeightMatrix[i])
-      x.ReceiveModelFromServer(consolidateWeightMatrix_to_client.copy(),len(consolidateWeightMatrix_to_client),"INTERCHANGE")
-      consolidateWeightMatrix_to_client.clear()
-    self.consolidateWeightMatrix.clear()
-    print("Feedbacks Enviados e descartados")
-
-
-'''
-Server::ConsolidateModels----------------Server::FeedBackConsolidatedModel--------------Client::RefreshModel
-'''
-
-#numClients = 3; #Can be gotten from user
-
-#lstClients = [];
-
-'''
-A cada round:
-
--Treinando o modelo com dados do ns3, salva os pesos treinadose prevê com os pesos treinados;
-
--Recupera os pesos treinados e prevê com um arquivo estanque, gerado em outro experimento, que deve estar test_client.csv. Sempre que LoadFromFile é True, pesupõe-se uma tentativa de aderência a um exprerimeto com configurção diferente.
-
-'''
 
 
 def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTestPath, parExpDescription,parSequencialTraining=False):
@@ -1195,14 +919,14 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
 
 
     
-    exp_epoch = 3
+    exp_epoch = 100
     exp_units = 100
     exp_batch_size=10
     exp_T=30
     exp_steps_out =5
     exp_congestion_protocol = "BBR"
     exp_web_nodes= 2
-    exp_num_rodadas=10 #Quantas rodadas de aprendizado online. É o range do for 
+    exp_num_rodadas=100 #Quantas rodadas de aprendizado online. É o range do for 
 
     #Registando dados gerais, comum a todos os clientes, no readme.txt
 
@@ -1328,9 +1052,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
       #Observe que isso pode ser feito por treinamento ou por consolidação
       #Quando feito por treinamento, os pesos são sempre atualizados no final do treinamento
       #Já na consolidação, vai depender se houve um melhor resultado (média avsoluta dos erros)
-      
-      ##objClient1.RefreshModel(bool(i)) #Refresh por Treinamento
-      
+      objClient1.RefreshModel(bool(i)) #Refresh por Treinamento
       #gc.collect()
       #objClient2.RefreshModel(parInitial=True)
       #gc.collect()
@@ -1404,113 +1126,3 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
 
     objClient1.PlotResults()
     return exp_dir
-
-
-#Avaliar um modelo, treinado em uma determinada topologia
-#em uma outra parPathTestFromAnotherTopology
-def EvalueteModelLevarage(parPreviousExpTime,
-                          parPreviousTrainingExpDir, 
-                          parPreviousTrainingPath, 
-                          parPathTestFromAnotherTopology, 
-                          parExpDescription):
-    
-    #local_env=True;
-    exp_time=parPreviousExpTime
-    #exp_time=time.ctime();
-
-    #exp_time = exp_time.replace(":", "_" )
-    #exp_time = exp_time.replace(" ", "_" )
-    '''
-    if(not local_env):
-      exp_dir = "/content/drive/MyDrive/Colab Notebooks/Exp_000007/"
-    else:
-      exp_dir = "./Exp_000007/"
-    '''
-    exp_dir=parPreviousTrainingExpDir
-    exp_dir_out_from_fit = exp_dir+"/from_fit" #para armazenar saídas obtidas de pesos/modelos treinados (fit)
-    exp_dir_out_from_file = exp_dir+"/from_fle" #para armazenar saídas obtidas de pesos/modelos recuperados do arquivo 
-    #criando efetivamednte os diretórios
-    #Não precisa criar os diretórios, pois, a princípio já existem
-
-
-    exp_epoch = 50
-    exp_units = 100
-    exp_batch_size=1
-    exp_T=30
-    exp_steps_out =5
-    exp_congestion_protocol = "BBR"
-    exp_web_nodes= 2
-    
-    file_path = exp_dir+"/readme.txt"
-
-    f = open(file_path, "a")
-
-    f.write("Teste de Aderencia: \n")
-    f.write(parExpDescription)
-    f.close()
-
-
-    
-    client01_id=0
-    client01_training_path = parPreviousTrainingExpDir
-    client01_test_path = parPathTestFromAnotherTopology
-    
-    client01_epoch = exp_epoch
-    client01_units = exp_units;
-    client01_batch_size=exp_batch_size
-    client01_T=exp_T
-    client01_steps_out = exp_steps_out
-    client01_congestion_protocol = exp_congestion_protocol
-    client01_web_nodes= exp_web_nodes
-    client01_RTT_router = "50ms"
-
-
-    #Registando dados relativos ao cliente 0, comum a todos os clientes, no readme_cliente_000.txt
-
-    objClient1 = Client(client01_id,
-                        client01_training_path,
-                        client01_test_path, 
-                        client01_epoch,
-                        client01_units,
-                        client01_batch_size,
-                        client01_T,
-                        client01_steps_out,
-                        client01_congestion_protocol,
-                        client01_web_nodes,
-                        client01_RTT_router,
-                        exp_time,
-                        exp_dir,
-                        exp_dir_out_from_fit,
-                        exp_dir_out_from_file)
-
-    lastRound=1
-
-    objClient1.GetPrevision(lastRound,parLoadTestFromNotTrainedFile=True)
-    objClient1.PlotResults(parLoadFromNotTrainedFileFile=True)
-   
-
-
-
-description = "testar com outros dados, mas gerados com uma topologia dumbell, igual a do treinamento."+"\n"  
-description =description + "Média móvel da quantidade de pacotes na fila.\n"
-description =description + "Modelo com 300 épocas em cada round\n"
-description = description+ "Verificando a aderencia sobre um dos modelos concatenados\n"
-description = description+ "Dados que não participaram do treinamento, mas gerados na mesma rede.\n"
-#description = description+ "Na topologia considerada, ajustou-se os RTT entre os roteadores de 0,005ms, pois com roteadores, o processamento da fila faz com que demore mais.\n"
-#description = description+ ".\n"
-
-#EvalueteModelLevarage(parPreviousExpTime="Sat_May_20_16_52_50_2023",
-#                      parPreviousTrainingExpDir="./Exp_0000013/Sat_May_20_16_52_50_2023/",
-#                      parPreviousTrainingPath="./Exp_0000013/training_client01-09.csv",
-#                      parPathTestFromAnotherTopology="./Exp_0000013/test_client01_11.csv",
-#                      parExpDescription=description)
-
-
-exp_dir = "./Exp_0000016/"
-GeneralTraining(parExpDir="./Exp_0000016/",
-                parPreviousTrainingExpDir=exp_dir,
-                parTrainingPath="./Exp_0000016/training_client01.csv",
-                parTestPath="./Exp_0000016/test_client01.csv",
-                parExpDescription=description,
-                parSequencialTraining=False)
-
