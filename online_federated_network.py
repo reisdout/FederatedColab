@@ -164,10 +164,10 @@ class Client():
            file1.writelines("cwnd (Bytes): "+str(cwnd_normalizer)+"\n")
            file1.close()
        
-       print("ack_ewma_normalizer: ", ack_ewma_normalizer)
-       print("send_ewma: ", send_ewma_normalizer)
-       print("rtt_ratio_normalizer: ", rtt_ratio_normalizer)
-       print("cwnd (Bytes): ", cwnd_normalizer)
+       #print("ack_ewma_normalizer: ", ack_ewma_normalizer)
+       #print("send_ewma: ", send_ewma_normalizer)
+       #print("rtt_ratio_normalizer: ", rtt_ratio_normalizer)
+       #print("cwnd (Bytes): ", cwnd_normalizer)
 
        data['ack_ewma(ms)'] = data['ack_ewma(ms)'].div(ack_ewma_normalizer)
        data['send_ewma(ms)'] = data['send_ewma(ms)'].div(send_ewma_normalizer)
@@ -717,8 +717,8 @@ class Client():
       
       
 
-      print("Observe os testadores")
-      print("shape: ",test_vectors.shape)
+      #print("Observe os testadores")
+      #print("shape: ",test_vectors.shape)
       #print(test_vectors)
       #input("testadores exibidos")
 
@@ -788,13 +788,13 @@ class Client():
     def PlotResults(self,parLoadFromNotTrainedFileFile=False):
       fig, graph = plt.subplots()
       
-      r=self.real_congestion_test
+      #r=self.real_congestion_test
       
-      lp=self.latest_prevision
+      #lp=self.latest_prevision
       
-      print(r)
+      #print(r)
       
-      print(lp)
+      #print(lp)
       
       #graph.plot(self.real_congestion_test[self.real_congestion_test.shape[0]-300:self.real_congestion_test.shape[0],:], color = 'red', label = 'Cng Real')
       graph.plot(self.real_congestion_test, color = 'red', label = 'Cng Real')
@@ -926,7 +926,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
     exp_steps_out =5
     exp_congestion_protocol = "BBR"
     exp_web_nodes= 2
-    exp_num_rodadas=100 #Quantas rodadas de aprendizado online. É o range do for 
+    exp_num_rodadas=300 #Quantas rodadas de aprendizado online. É o range do for 
 
     #Registando dados gerais, comum a todos os clientes, no readme.txt
 
@@ -976,6 +976,10 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
     f.write(str(client01_RTT_router))
     f.close()
 
+
+    print("Dados do Cliente:")
+    print("client01_epoch = ",client01_epoch)
+    print("numRounds = ", exp_num_rodadas)
     objClient1 = Client(client01_id,
                         client01_training_path,
                         client01_test_path, 
@@ -1046,6 +1050,9 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
     #########################Atualizando o modelo por treinamento e Consolidação do Servidor#######################################
 
     '''
+    
+    
+    
     for i in range(exp_num_rodadas):
       print("##################Round ", i, " ##################################")
       #########################Atualizando o modelo por treinamento #######################################
@@ -1065,7 +1072,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
 
 
       prev = objClient1.GetPrevision()
-      print(prev)
+      #print(prev)
       #objClient1.PlotResults();
 
       ###################Pelo Arquivo#################################

@@ -9,4 +9,4 @@
 
 0 1 3 1
 
-Experimento realizado com 0.9/0.1 do routerocupation_ewma e 100 rounds
+Experimento realizado com 0.9/0.1 do routerocupation_ewma e 200 rounds
