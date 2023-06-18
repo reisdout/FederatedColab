@@ -36,12 +36,15 @@ class LoggingCallback(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
 
         
-        file_path = self.exp_dir+"/readme.txt"
+        #file_path = self.exp_dir+"/readme.txt"
 
-        f = open(file_path, "a")
+        #f = open(file_path, "a")
         msg = "{Epoch: %i} %s" % (epoch, ", ".join("%s: %f" % (k, v) for k, v in logs.items()))
-        f.write(msg+"\n")
-        f.close()
+        #f.write(msg+"\n")
+        #f.close()
+        if(epoch == 49):
+         print(msg)
+
 
 
 
@@ -919,7 +922,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
 
 
     
-    exp_epoch = 100
+    exp_epoch = 50
     exp_units = 100
     exp_batch_size=10
     exp_T=30
@@ -980,6 +983,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
     print("Dados do Cliente:")
     print("client01_epoch = ",client01_epoch)
     print("numRounds = ", exp_num_rodadas)
+    
     objClient1 = Client(client01_id,
                         client01_training_path,
                         client01_test_path, 
