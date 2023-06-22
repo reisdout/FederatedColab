@@ -198,7 +198,7 @@ class Client():
       base = base.dropna()
       base = self.NormalizeFeatures(base,parLoadFromNotTrainedFile=False,parSequencialTraining=parSequencialTraining)
       
-      base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide+self.n_steps_out-1,base.shape[0]),axis=0) 
+      base = base.drop(labels=range(int(5*self.T/3)+self.deslocamento*self.slide+self.n_steps_out-1,base.shape[0]),axis=0) 
     
       self.slide=self.slide+1 #Na hora de testar já deve estar deslocado
           
@@ -392,7 +392,7 @@ class Client():
       return regressor
 
 
-    def RefreshModel(self,parSequencialTraining=False): #Constroi na primeira vez e atualiza, a partir da avaliação do servidor cetral
+    def RefreshModel(self,parSequencialTraining=False,parUpdateFirstWeights=True): #Constroi na primeira vez e atualiza, a partir da avaliação do servidor cetral
       #pensar melhor no critério
       previsores,real_congestion = self.LoadTrainingDataSet(parSequencialTraining)
 
@@ -400,28 +400,29 @@ class Client():
       #if(parSequencialTraining):
           #regressor=self.GetModelFromFile(1)# 1,pois, a princípio temos apenas duas rodadas (rounds no for da função que chama essa classe) 0 e 1
       #else:
-      regressor = self.GetModel();
+      if(parUpdateFirstWeights):
+          regressor = self.GetModel();
       #indica que já foi feito um treinamento ou consolidação de modelos prévia
-      if(len (self.weightsClientModel)):
-        regressor.set_weights(self.weightsClientModel)      
+          if(len (self.weightsClientModel)):
+              regressor.set_weights(self.weightsClientModel)      
 
-      opt = keras.optimizers.Adam(learning_rate=0.0001)
-      regressor.compile(optimizer = opt, loss = 'mean_squared_error',metrics = ['mean_absolute_error'])
-      #es = EarlyStopping(monitor = 'loss', min_delta = 1e-10, patience = 10, verbose = 1)
-      #rlr = ReduceLROnPlateau(monitor = 'loss', factor = 0.2, patience = 5, verbose = 1)
-      #mcp = ModelCheckpoint(filepath = self.exp_dir+"/pesos.h5", monitor = 'loss',  save_weights_only = True, save_freq='epoch',verbose = 1)
-      #regressor.fit(previsores, real_congestion, epochs = 50, batch_size = 32, callbacks = [es, rlr, mcp])
-      regressor.fit(previsores, real_congestion, epochs = self.exp_epoch, batch_size = self.exp_batch_size,verbose=0,
+          opt = keras.optimizers.Adam(learning_rate=0.0001)
+          regressor.compile(optimizer = opt, loss = 'mean_squared_error',metrics = ['mean_absolute_error'])
+          #es = EarlyStopping(monitor = 'loss', min_delta = 1e-10, patience = 10, verbose = 1)
+          #rlr = ReduceLROnPlateau(monitor = 'loss', factor = 0.2, patience = 5, verbose = 1)
+          #mcp = ModelCheckpoint(filepath = self.exp_dir+"/pesos.h5", monitor = 'loss',  save_weights_only = True, save_freq='epoch',verbose = 1)
+          #regressor.fit(previsores, real_congestion, epochs = 50, batch_size = 32, callbacks = [es, rlr, mcp])
+          regressor.fit(previsores, real_congestion, epochs = self.exp_epoch, batch_size = self.exp_batch_size,verbose=0,
                 callbacks=[LoggingCallback(parExpDir=self.exp_dir)])
       #self.weightsClientModel = regressor.get_weights().copy()
-      regressor_json = regressor.to_json()
-      with open(self.exp_dir+"/model_"+str(self.model_saves)+".json",'w') as json_file:
-        json_file.write(regressor_json)
-      regressor.save_weights(self.exp_dir+"/model_weights_"+str(self.model_saves)+".h5")
-      self.model_saves=self.model_saves+1
-      self.weightsClientModel.clear()
-      for e in regressor.get_weights():
-        self.weightsClientModel.append(e)
+          regressor_json = regressor.to_json()
+          with open(self.exp_dir+"/model_"+str(self.model_saves)+".json",'w') as json_file:
+              json_file.write(regressor_json)
+          regressor.save_weights(self.exp_dir+"/model_weights_"+str(self.model_saves)+".h5")
+          self.model_saves=self.model_saves+1
+          self.weightsClientModel.clear()
+          for e in regressor.get_weights():
+              self.weightsClientModel.append(e)
 
 
     #Apenas abre o arquivo e carrega os pesos. Falta Completar, pois os certo é continuar um treinamento a partir do modeo carregado 
@@ -597,7 +598,8 @@ class Client():
         '''
         #base = base.drop(labels=range(0,self.deslocamento*self.slide),axis=0)
         #base = base.drop(labels=range(10*self.T+self.deslocamento*self.slide,base.shape[0]),axis=0)
-        stop_point = 10*self.T+self.deslocamento*self.slide #Se stop point = 300 é de 0 a 299, daí o (stop_point -1) abaixo
+        stop_point = int(5*self.T/3)+self.deslocamento*self.slide #Se stop point = 300 é de 0 a 299, daí o (stop_point -1) abaixo
+        #A linha abaixo, vai pegando elemento a elemento, de onde parou o último deslocamento
         self.real_congestion_test[self.slide-1,0] = base.iloc[(stop_point-1)+self.n_steps_out:stop_point + self.n_steps_out+1, 5:6].values[0,0]
         base = base.drop(labels=range(stop_point,base.shape[0]),axis=0)
 
@@ -791,13 +793,13 @@ class Client():
     def PlotResults(self,parLoadFromNotTrainedFileFile=False):
       fig, graph = plt.subplots()
       
-      #r=self.real_congestion_test
+      r=self.real_congestion_test
       
-      #lp=self.latest_prevision
+      lp=self.latest_prevision
       
-      #print(r)
+      print(r)
       
-      #print(lp)
+      print(lp)
       
       #graph.plot(self.real_congestion_test[self.real_congestion_test.shape[0]-300:self.real_congestion_test.shape[0],:], color = 'red', label = 'Cng Real')
       graph.plot(self.real_congestion_test, color = 'red', label = 'Cng Real')
@@ -922,14 +924,14 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
 
 
     
-    exp_epoch = 50
+    exp_epoch = 100
     exp_units = 100
     exp_batch_size=10
     exp_T=30
     exp_steps_out =5
     exp_congestion_protocol = "BBR"
     exp_web_nodes= 2
-    exp_num_rodadas=300 #Quantas rodadas de aprendizado online. É o range do for 
+    exp_num_rodadas=50 #Quantas rodadas de aprendizado online. É o range do for 
 
     #Registando dados gerais, comum a todos os clientes, no readme.txt
 
@@ -1063,7 +1065,7 @@ def GeneralTraining(parExpDir, parPreviousTrainingExpDir,parTrainingPath, parTes
       #Observe que isso pode ser feito por treinamento ou por consolidação
       #Quando feito por treinamento, os pesos são sempre atualizados no final do treinamento
       #Já na consolidação, vai depender se houve um melhor resultado (média avsoluta dos erros)
-      objClient1.RefreshModel(bool(i)) #Refresh por Treinamento
+      objClient1.RefreshModel(bool(i), not(bool(i))) #Refresh por Treinamento
       #gc.collect()
       #objClient2.RefreshModel(parInitial=True)
       #gc.collect()
