@@ -48,3 +48,4 @@ Tivemos que estrangular o gargalo, pois o vegas não atingia o nível 2 de conge
 
 
 
+0.11720937 0.11443578 0.39816449 0.22727273
